@@ -18,7 +18,10 @@ router.beforeEach(async (to, from , next) => {
 
   if (to.meta.login && !userStore.isLogin) {
     next({
-      name: 'Login'
+      name: 'Login',
+      query: {
+        redirect: encodeURIComponent(window.location.hash)
+      }
     })
   }
   // 获取用户信息
@@ -30,4 +33,3 @@ router.beforeEach(async (to, from , next) => {
 export function setupRouter(app: App<Element>) {
   app.use(router)
 }
-

@@ -1,22 +1,26 @@
 <template>
-  <div :class="['message', { 'is-me': isMe }]">
-    <DanImage v-if="avatar || isMe" class="avatar" fit="cover" round />
+  <div :class="['message', { 'is-me': detail.isMe }]">
+    <DanImage
+      v-if="avatar || detail.isMe"
+      :src="detail.avatar"
+      class="avatar"
+      fit="cover"
+      round
+    />
     <div class="info">
-      <div v-if="!isMe" class="name">我是笨蛋小扁担</div>
-      <div class="msg-card">
-        Esse incididunt occaecat mollit excepteur nostrud velit amet pariatur amet cupidatat. Nisi excepteur ullamco esse laboris sit amet dolore nisi labore nisi. Officia ut nisi nostrud aliquip labore aliquip enim reprehenderit exercitation pariatur. Ullamco quis sit irure aliqua quis ut officia exercitation aute cillum et est fugiat ullamco. Aliquip ea adipisicing fugiat ipsum enim fugiat ut aliquip. Eu Lorem voluptate nulla dolore aute esse minim sint esse sit ut. Dolore qui sit aute quis sunt commodo. Ex exercitation amet aliquip in eu laborum. Lorem commodo commodo velit ipsum ea. Tempor proident irure deserunt aliquip consequat eu elit esse id proident ad fugiat.
-      </div>
+      <div v-if="!detail.isMe" class="name">{{ detail.nickname }}</div>
+      <div v-text="detail.msg" class="msg-card" />
     </div>
   </div>
 </template>
 
 <script lang='ts' setup>
+import { MsgItem } from '@/store/modules/chat'
 
 withDefaults(defineProps<{
-  isMe?: boolean;
+  detail: MsgItem;
   avatar?: boolean;
 }>(), {
-  isMe: false,
   avatar: true
 })
 
@@ -49,6 +53,7 @@ withDefaults(defineProps<{
     }
   }
   &.is-me {
+    justify-content: flex-end;
     .avatar {
       order: 2;
     }

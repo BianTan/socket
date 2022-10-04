@@ -35,6 +35,7 @@ const borderRadius = computed(() => {
 
 <style lang='scss' scoped>
 .dan-image {
+  overflow: hidden;
   background-color: white;
   .image {
     width: 100%;

@@ -1,11 +1,14 @@
-import { router } from '@/router';
 import { defineStore } from 'pinia'
+import { useSocket } from '@/hooks/useSocket'
+import { useChatStore } from './chat'
+import { router } from '@/router'
 
 interface UserState {
-  userInfo: null | UserInfo;
+  info: null | UserInfo;
+  users: UserInfo[];
 }
 interface UserInfo {
-  uid: number;
+  uid: string;
   nickname: string;
   avatar: string;
 }
@@ -13,20 +16,31 @@ interface UserInfo {
 export const useUserStore = defineStore({
   id: 'app-user',
   state: (): UserState => ({
-    userInfo: null
+    info: null,
+    users: []
   }),
   getters: {
-    isLogin: (state) => !!state.userInfo
+    isLogin: (state) => !!state.info
   },
   actions: {
-    login({ nickname, email = '' }: { nickname: string; email: string; }) {
-      this.userInfo = {
-        uid: 1,
-        nickname,
-        avatar: 'https://secure.gravatar.com/avatar/32a82c21335fafd4bd8e069b6d74aa5c?s=60&d=mm&r=g'
-      }
-      router.replace({
-        name: 'Home'
+    login(payload: { nickname: string; email: string; } | { session: string; }) {
+      const { socket } = useSocket()
+      socket.auth = payload
+      socket.connect()
+      socket.on('login', ({ info, users, rooms, session }) => {
+        const chatStore = useChatStore()
+        
+        this.info = info
+        this.users = users
+        chatStore.rooms = rooms
+
+        localStorage.setItem('session', session)
+        socket.off('login')
+        socket.on('message', chatStore.onMessage)
+        
+        router.replace({
+          name: 'Home'
+        })
       })
     },
     async getUserInfo(reset = false) {

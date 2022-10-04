@@ -1,19 +1,28 @@
 <template>
   <div class="message-item" @click="() => emit('click')">
-    <DanImage src="" fit="cover" round class="avatar" />
+    <DanImage :src="detail.img" fit="cover" round class="avatar" />
     <div class="info">
       <div class="name">{{ detail?.name || '消息标题' }}</div>
       <div class="msg">{{ detail?.msg || '消息标题' }}</div>
     </div>
+    <div v-if="detail.count" class="count">{{ count }}</div>
   </div>
 </template>
 
 <script lang='ts' setup>
+import { computed } from 'vue'
+import { RoomItem } from '@/store/modules/chat'
 
-withDefaults(defineProps<{
-  detail?: any;
+const props = withDefaults(defineProps<{
+  detail: RoomItem;
 }>(), {})
 const emit = defineEmits(['click'])
+
+const count = computed(() => {
+  const num = props.detail.count
+  if (!num) return 0
+  return Math.min(99, num)
+})
 
 </script>
 
@@ -23,6 +32,7 @@ const emit = defineEmits(['click'])
   align-items: center;
   padding: 12px 16px;
   background-color: #E8E8E8;
+  position: relative;
   .avatar {
     width: 52px;
     height: 52px;
@@ -40,6 +50,19 @@ const emit = defineEmits(['click'])
       font-size: 14px;
       line-height: 23px;
     }
+  }
+  .count {
+    position: absolute;
+    top: 6px;
+    left: 8px;
+    color: white;
+    font-size: 16px;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
+    border-radius: 50%;
+    background-color: red;
   }
   &:not(:last-child) {
     border-bottom: 1px solid white;

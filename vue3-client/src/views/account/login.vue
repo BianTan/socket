@@ -16,9 +16,11 @@
 </template>
 
 <script lang='ts' setup>
-import { reactive } from 'vue'
+import { reactive, onMounted } from 'vue'
+import { useSocket } from '@/hooks/useSocket'
 import { useUserStore } from '@/store/modules/user'
 
+const { socket } = useSocket()
 const userStore = useUserStore()
 
 const loginForm = reactive({
@@ -27,6 +29,21 @@ const loginForm = reactive({
 })
 
 const login = () => userStore.login(loginForm)
+
+socket.on('connect_error', (err) => {
+  console.log('err.message', err.message)
+})
+
+const init = () => {
+  const session = localStorage.getItem('session')
+  if (!session) return
+  userStore.login({ session })
+}
+init()
+
+onMounted(() => {
+  socket.off('connect_error')
+})
 
 </script>
 
