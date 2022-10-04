@@ -1,7 +1,7 @@
 import type { AppRouteModule } from '@/router/types'
 import MainLayout from '@/layouts/main.vue'
 
-const AccountRoute: AppRouteModule = {
+const MainRoute: AppRouteModule = {
   path: '/',
   name: 'Main',
   component: MainLayout,
@@ -18,4 +18,4 @@ const AccountRoute: AppRouteModule = {
   }
 }
 
-export default AccountRoute
+export default MainRoute

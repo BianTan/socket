@@ -10,6 +10,8 @@ const app = createApp(App)
 import 'normalize.css'
 // 全局 css
 import './assets/css/global.scss'
+// Rem
+import 'amfe-flexible'
 
 // 应用 pinia 全局状态管理
 setupStore(app)

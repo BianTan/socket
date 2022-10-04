@@ -1,6 +1,8 @@
 <template>
   <div class="main">
-    <router-view class="views" />
+    <div class="views">
+      <router-view class="page" />
+    </div>
     <div class="tabs">
       <div class="tab active">
         <i class="iconfont icon-home" />
@@ -21,6 +23,10 @@
   flex-direction: column;
   .views {
     flex: 1;
+    overflow: auto;
+    .page {
+      height: 100%;
+    }
   }
   .tabs {
     flex-shrink: 0;
@@ -41,7 +47,7 @@
       }
       .text {
         color: #777;
-        font-size: 14px;
+        font-size: 12px;
       }
       &.active {
         .text {

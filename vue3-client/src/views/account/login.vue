@@ -43,11 +43,16 @@ const login = () => userStore.login(loginForm)
   }
   .login-form {
     width: 100%;
-    padding: 24px 48px;
+    padding: 24px;
+    margin-top: 22px;
     box-sizing: border-box;
     .item  {
       display: flex;
       align-items: center;
+      .label {
+        font-size: 16px;
+        flex-shrink: 0;
+      }
       input {
         flex: 1;
         outline: none;
@@ -55,6 +60,7 @@ const login = () => userStore.login(loginForm)
         padding: 6px 12px;
         border-radius: 6px;
         border: 1px solid #888;
+        font-size: 16px;
       }
       &:not(:last-child) {
         margin-bottom: 12px;
@@ -63,6 +69,7 @@ const login = () => userStore.login(loginForm)
   }
   .login-btn {
     color: white;
+    font-size: 16px;
     width: 64px;
     height: 64px;
     line-height: 64px;
