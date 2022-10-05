@@ -23,6 +23,8 @@ io.use((socket, next) => {
         ...socket.user,
         connected: true
       })
+      // 加入房间
+      socket.join('main')
       return next()
     }
     if (!nickname) {
@@ -53,6 +55,7 @@ io.use((socket, next) => {
 })
 
 io.on('connection', (socket) => {
+  console.log(socket.id)
   const users = Array.from(userMap.values())
 
   // 登录
