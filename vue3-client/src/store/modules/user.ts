@@ -1,7 +1,5 @@
 import { defineStore } from 'pinia'
 import { useSocket } from '@/hooks/useSocket'
-import { useChatStore } from './chat'
-import { router } from '@/router'
 
 interface UserState {
   info: null | UserInfo;
@@ -11,6 +9,8 @@ interface UserInfo {
   uid: string;
   nickname: string;
   avatar: string;
+  email: string;
+  connected: boolean;
 }
 
 export const useUserStore = defineStore({
@@ -20,7 +20,8 @@ export const useUserStore = defineStore({
     users: []
   }),
   getters: {
-    isLogin: (state) => !!state.info
+    isLogin: (state) => !!state.info,
+    onlineCount: (state) => state.users.filter(f => f.connected).length
   },
   actions: {
     login(payload: { nickname: string; email: string; } | { session: string; }) {
@@ -43,8 +44,13 @@ export const useUserStore = defineStore({
       const hasUser = userIndex >= 0
       if (type === 1) {
         // user connected
-        if (hasUser) return
-        this.users.push(payload)
+        if (hasUser) {
+          Object.assign(this.users[userIndex], {
+            connected: true
+          })
+        } else {
+          this.users.push(payload)
+        }
       } else if (type === 2) {
         // user disconnected
         if (!hasUser) return

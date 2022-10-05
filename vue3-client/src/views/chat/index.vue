@@ -12,7 +12,7 @@
         />
         <div class="info">
           <div class="name">{{ roomDetail.name }}</div>
-          <!-- <div class="state">{{ state }}</div> -->
+          <div class="state">{{ state }}</div>
         </div>
       </div>
     </div>
@@ -58,17 +58,20 @@ const MsgListRef = ref()
 const id = ref(route.params.id)
 const content = ref('')
 const isGroup = ref(id.value === 'main')
-const state = computed(() => {
-  return isGroup.value
-    ? '12 人在线'
-    : '在线'
-})
 const list = computed(() => {
   const msgList = chatStore.msgMap[id.value as string]
   return msgList || []
 })
 const roomDetail = computed(() => {
   return chatStore.rooms.find(f => f.id === id.value)
+})
+const userDetail = computed(() => {
+  return userStore.users.find(f => f.uid === id.value)
+})
+const state = computed(() => {
+  return isGroup.value
+    ? `${userStore.onlineCount} 人在线`
+    : userDetail.value?.connected ? '在线' : '离线'
 })
 
 const onBack = () => router.push({ name: 'Home' })
@@ -97,7 +100,6 @@ const onSend = () => {
   })
   content.value = ''
   // 更新列表的最新消息
-  console.log('payload.to', payload.to)
   const roomIndex = chatStore.rooms.findIndex(f => f.id === (isGroup ? 'main' : payload.to))
   if (roomIndex >= 0) {
     Object.assign(chatStore.rooms[roomIndex], {
