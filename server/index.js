@@ -18,7 +18,11 @@ io.use((socket, next) => {
     if (user) {
       socket.user = { ...user }
       socket.sessionID = session
-      socket.join('main')
+      // 更新用户状态
+      userMap.set(socket.sessionID, {
+        ...socket.user,
+        connected: true
+      })
       return next()
     }
     if (!nickname) {
@@ -80,9 +84,9 @@ io.on('connection', (socket) => {
     // 给除了自己的人发送下线通知
     socket.broadcast.emit('user disconnected', {
       uid: socket.user.uid
-    });
+    })
     // 更新用户状态
-    userMap.get(socket.sessionID, {
+    userMap.set(socket.sessionID, {
       ...socket.user,
       connected: false
     })

@@ -90,11 +90,12 @@ const onSend = () => {
   if (!isGroup) payload['to'] = id.value as string
   let msgList = chatStore.msgMap[id.value as string]
   if (!msgList) msgList = chatStore.msgMap[id.value as string] = []
-  const { avatar, nickname } = userStore.info
+  const { avatar, nickname, uid } = userStore.info
   // 自己发的手动插入一条新消息
   msgList.push({
     avatar,
     nickname,
+    uid,
     msg: content.value,
     isMe: true
   })

@@ -8,21 +8,29 @@
       round
     />
     <div class="info">
-      <div v-if="!detail.isMe" class="name">{{ detail.nickname }}</div>
+      <div v-if="!detail.isMe" class="name">
+        <span :class="['state', { online: userInfo?.connected }]" />
+        {{ detail.nickname }}
+      </div>
       <div v-text="detail.msg" class="msg-card" />
     </div>
   </div>
 </template>
 
 <script lang='ts' setup>
+import { computed } from 'vue'
 import { MsgItem } from '@/store/modules/chat'
+import { useUserStore } from '@/store/modules/user'
 
-withDefaults(defineProps<{
+const props = withDefaults(defineProps<{
   detail: MsgItem;
   avatar?: boolean;
 }>(), {
   avatar: true
 })
+
+const userStore = useUserStore()
+const userInfo = computed(() => userStore.users.find(f => f.uid === props.detail.uid))
 
 </script>
 
@@ -43,6 +51,18 @@ withDefaults(defineProps<{
       color: #333;
       font-size: 12px;
       margin: 8px 0;
+      display: flex;
+      align-items: center;
+      .state {
+        width: 6px;
+        height: 6px;
+        margin-right: 6px;
+        border-radius: 50%;
+        background-color: #febc2e;
+        &.online {
+          background-color: #28c840;
+        }
+      }
     }
     .msg-card {
       padding: 12px;
@@ -60,7 +80,7 @@ withDefaults(defineProps<{
     .info {
       order: 1;
       .msg-card {
-        margin-top: 24px;
+        margin-top: 12px;
         border-radius: 8px 0 8px 8px;
       }
     }

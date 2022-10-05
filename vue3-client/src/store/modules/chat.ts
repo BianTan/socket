@@ -13,6 +13,7 @@ export interface MsgItem {
   nickname: string;
   msg: string;
   isMe: boolean;
+  uid: string;
 }
 interface ChatState {
   curRooms: string;
@@ -40,6 +41,7 @@ export const useChatStore = defineStore({
       const temp = {
         avatar: '',
         nickname: '',
+        uid: payload.from,
         msg: payload.msg,
         isMe: uid === payload.from
       }
