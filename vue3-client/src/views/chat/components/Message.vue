@@ -47,6 +47,9 @@ const userInfo = computed(() => userStore.users.find(f => f.uid === props.detail
   .info {
     order: 2;
     padding: 0 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
     .name {
       color: #333;
       font-size: 12px;
@@ -79,6 +82,7 @@ const userInfo = computed(() => userStore.users.find(f => f.uid === props.detail
     }
     .info {
       order: 1;
+      align-items: flex-end;
       .msg-card {
         margin-top: 12px;
         border-radius: 8px 0 8px 8px;
