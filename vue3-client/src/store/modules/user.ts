@@ -27,21 +27,6 @@ export const useUserStore = defineStore({
       const { socket } = useSocket()
       socket.auth = payload
       socket.connect()
-      socket.on('login', ({ info, users, rooms, session }) => {
-        const chatStore = useChatStore()
-        
-        this.info = info
-        this.users = users
-        chatStore.rooms = rooms
-
-        localStorage.setItem('session', session)
-        socket.off('login')
-        socket.on('message', chatStore.onMessage)
-        
-        router.replace({
-          name: 'Home'
-        })
-      })
     },
     async getUserInfo(reset = false) {
       if (!reset && this.isLogin) return null
@@ -50,6 +35,22 @@ export const useUserStore = defineStore({
       } catch (err) {
         console.log(err)
         return null
+      }
+    },
+    // 更新用户状态
+    updateUserState(type: 1 | 2, payload: UserInfo) {
+      const userIndex = this.users.findIndex(f => f.uid === payload.uid)
+      const hasUser = userIndex >= 0
+      if (type === 1) {
+        // user connected
+        if (hasUser) return
+        this.users.push(payload)
+      } else if (type === 2) {
+        // user disconnected
+        if (!hasUser) return
+        Object.assign(this.users[userIndex], {
+          connected: false
+        })
       }
     }
   }

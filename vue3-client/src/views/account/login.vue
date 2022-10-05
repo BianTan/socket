@@ -16,12 +16,16 @@
 </template>
 
 <script lang='ts' setup>
-import { reactive, onMounted } from 'vue'
-import { useSocket } from '@/hooks/useSocket'
+import { reactive, onMounted, onUnmounted } from 'vue'
+import { useRoute } from 'vue-router'
 import { useUserStore } from '@/store/modules/user'
+import { useChatStore } from '@/store/modules/chat'
+import { useSocket } from '@/hooks/useSocket'
 
 const { socket } = useSocket()
+const route = useRoute()
 const userStore = useUserStore()
+const chatStore = useChatStore()
 
 const loginForm = reactive({
   nickname: '',
@@ -29,10 +33,6 @@ const loginForm = reactive({
 })
 
 const login = () => userStore.login(loginForm)
-
-socket.on('connect_error', (err) => {
-  console.log('err.message', err.message)
-})
 
 const init = () => {
   const session = localStorage.getItem('session')
@@ -42,7 +42,26 @@ const init = () => {
 init()
 
 onMounted(() => {
+  // 登录
+  socket.on('login', ({ info, users, rooms, session }) => {
+    userStore.info = info
+    userStore.users = users
+    chatStore.rooms = rooms
+
+    localStorage.setItem('session', session)
+    
+    const redirect = decodeURIComponent((route.query.redirect as string) || '#/home')
+    window.location.replace(location.origin + redirect)
+  })
+  // 连接失败
+  socket.on('connect_error', (err) => {
+    console.log('err.message', err.message)
+    localStorage.removeItem('session')
+  })
+})
+onUnmounted(() => {
   socket.off('connect_error')
+  socket.off('login')
 })
 
 </script>

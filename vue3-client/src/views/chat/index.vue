@@ -71,7 +71,7 @@ const roomDetail = computed(() => {
   return chatStore.rooms.find(f => f.id === id.value)
 })
 
-const onBack = () => router.back()
+const onBack = () => router.push({ name: 'Home' })
 const onSend = () => {
   const payload: {
     type: 1 | 2;
@@ -81,12 +81,14 @@ const onSend = () => {
     type: isGroup ? 1 : 2,
     msg: content.value
   }
-  if (!isGroup) payload['to'] = id.value as string
+  if (!userStore.info) return
+  if (!payload.msg.trim()) return
 
+  if (!isGroup) payload['to'] = id.value as string
   let msgList = chatStore.msgMap[id.value as string]
   if (!msgList) msgList = chatStore.msgMap[id.value as string] = []
-  if (!userStore.info) return
   const { avatar, nickname } = userStore.info
+  // 自己发的手动插入一条新消息
   msgList.push({
     avatar,
     nickname,
@@ -94,15 +96,29 @@ const onSend = () => {
     isMe: true
   })
   content.value = ''
+  // 更新列表的最新消息
+  console.log('payload.to', payload.to)
+  const roomIndex = chatStore.rooms.findIndex(f => f.id === (isGroup ? 'main' : payload.to))
+  if (roomIndex >= 0) {
+    Object.assign(chatStore.rooms[roomIndex], {
+      msg: payload.msg.trim()
+    })
+  }
+  updateScroll()
 
+  // 发送消息
   socket.emit('message', payload)
+}
+const updateScroll = async () => {
+  if (!MsgListRef.value) return
+  await nextTick()
+  MsgListRef.value.scrollTop = MsgListRef.value.scrollHeight
 }
 
 onMounted(async () => {
   await nextTick()
   chatStore.curRooms = id.value as string
-  if (!MsgListRef.value) return
-  MsgListRef.value.scrollTop = MsgListRef.value.scrollHeight
+  updateScroll()
 })
 onUnmounted(() => {
   chatStore.curRooms = ''

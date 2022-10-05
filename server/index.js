@@ -7,11 +7,12 @@ const io = require('socket.io')(httpServer, {
 const md5 = require('md5')
 const { v4: uuidv4 } = require('uuid')
 
+// 注册用户
 const userMap = new Map()
 
 // 中间件
 io.use((socket, next) => {
-  const { session } = socket.handshake.auth
+  const { session, nickname } = socket.handshake.auth
   if (session) {
     const user = userMap.get(session)
     if (user) {
@@ -20,21 +21,29 @@ io.use((socket, next) => {
       socket.join('main')
       return next()
     }
+    if (!nickname) {
+      return next(new Error('无用户信息'))
+    }
   }
-  const { nickname, email = ''  } = socket.handshake.auth
+  const { email = ''  } = socket.handshake.auth
   if (!nickname) {
     return next(new Error("用户昵称不能为空"))
   }
-  const avatar = email ? `https://www.gravatar.com/avatar/${md5(email)}?s=64` : ''
+  // const avatar = email ? `https://www.gravatar.com/avatar/${md5(email)}?s=64` : ''
+  const avatar = `https://www.gravatar.com/avatar/${md5(email)}?s=64`
   const sessionID = uuidv4()
+  // 用户信息
   const user = {
     uid: uuidv4(),
     nickname,
-    avatar
+    avatar,
+    connected: true,
+    email
   }
-  userMap.set(sessionID, user)
+  userMap.set(sessionID, { ...user })
   socket.user = { ...user }
   socket.sessionID = sessionID
+  // 加入大厅
   socket.join('main')
   next()
 })
@@ -42,6 +51,7 @@ io.use((socket, next) => {
 io.on('connection', (socket) => {
   const users = Array.from(userMap.values())
 
+  // 登录
   socket.emit('login', {
     session: socket.sessionID,
     info: socket.user,
@@ -54,13 +64,34 @@ io.on('connection', (socket) => {
       }
     ]
   })
+  
+  socket.emit('加入的房间', [...socket.rooms])
 
+  // 用户连接
   socket.broadcast.emit('user connected', {
     ...socket.user,
     connected: true,
   })
+  // 用户断开连接
+  socket.on('disconnect', async () => {
+    const matchingSockets = await io.in(socket.userID).allSockets()
+    const isDisconnected = matchingSockets.size === 0
+    if (!isDisconnected) return
+    // 给除了自己的人发送下线通知
+    socket.broadcast.emit('user disconnected', {
+      uid: socket.user.uid
+    });
+    // 更新用户状态
+    userMap.get(socket.sessionID, {
+      ...socket.user,
+      connected: false
+    })
+  })
 
+  // 发送消息
   socket.on('message', ({ type, msg, to }) => {
+    // 空消息不做处理
+    if (!msg.trim()) return
     const { uid } = socket.user
     if (type === 1) {
       socket.to('main').emit('message', {
