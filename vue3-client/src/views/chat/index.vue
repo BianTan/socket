@@ -143,11 +143,14 @@ const onTap = (item: {
   }) => {
     if (item.isMe) return
     const { nickname, uid, avatar } = item
-    chatStore.rooms.push({
-      name: nickname,
-      img: avatar,
-      id: uid
-    })
+    const index = chatStore.rooms.findIndex(f => f.id === uid)
+    if (index < 0) {
+      chatStore.rooms.push({
+        name: nickname,
+        img: avatar,
+        id: uid
+      })
+    }
     router.push({
       name: 'Chat',
       params: {
