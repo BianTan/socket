@@ -82,7 +82,6 @@ class MessageStore2 extends SessionStore {
       [uid, 'main'].includes(from) ||
       [uid, 'main'].includes(to)
     ))
-    console.log('all', all)
     return all.reduce((temp, c) => {
       if (!temp[c.to]) temp[c.to] = []
       temp[c.to].push(c)
