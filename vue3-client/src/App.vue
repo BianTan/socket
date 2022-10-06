@@ -23,7 +23,7 @@ onMounted(() => {
     userStore.session = session
     chatStore.rooms = rooms
 
-    const redirect = decodeURIComponent((route.query.redirect as string) || '/home')
+    const redirect = (route.query.redirect as string) || '/home'
     router.replace(redirect)
   })
   // 连接失败
@@ -35,7 +35,7 @@ onMounted(() => {
       router.push({
         name: 'Login',
         query: {
-          redirect: encodeURIComponent(window.location.hash)
+          redirect: location.hash.replace('#', '')
         }
       })
     }

@@ -55,7 +55,7 @@ io.use((socket, next) => {
   }
   // const avatar = email ? `https://www.gravatar.com/avatar/${md5(email)}?s=64` : ''
   // 使用 CDN 加速头像
-  const avatar = `https://cdn.v2ex.com/gravatar/${md5(email)}?s=64`
+  const avatar = `https://gravatar.loli.net/avatar/${md5(email)}?s=64`
   const sessionID = uuidv4()
   // 用户信息
   const user = {
@@ -100,15 +100,18 @@ io.on('connection', (socket) => {
   })
   // 用户断开连接
   socket.on('disconnect', async () => {
+    // 搜索包含所有当前用户 ID 的连接
     const matchingSockets = await io.in(socket.user.uid).allSockets()
-    console.log('matchingSockets', matchingSockets)
+    // 判断是否当前用户的所有登录都已退出
     const isDisconnected = matchingSockets.size === 0
+    // 还有连接则直接 return 不做处理
     if (!isDisconnected) return
-    // 给除了自己的人发送下线通知
+    // 否则已经全部退出了
+    // 给除了自己的所有人发送下线通知
     socket.broadcast.emit('user disconnected', {
       uid: socket.user.uid
     })
-    // 更新用户状态
+    // 并且更新用户状态 - 离线
     userMap.set(socket.sessionID, {
       ...socket.user,
       connected: false

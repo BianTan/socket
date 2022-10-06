@@ -20,7 +20,7 @@ router.beforeEach(async (to, from , next) => {
     next({
       name: 'Login',
       query: {
-        redirect: encodeURIComponent(window.location.hash.replace('#', ''))
+        redirect: location.hash.replace('#', '')
       }
     })
   }
