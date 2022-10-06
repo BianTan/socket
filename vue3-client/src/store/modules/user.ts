@@ -23,7 +23,7 @@ export const useUserStore = defineStore({
     session: useStorage('session', '', localStorage)
   }),
   getters: {
-    isLogin: (state) => state.info && state.session,
+    isLogin: (state) => Boolean(state.info && state.session),
     onlineCount: (state) => state.users.filter(f => f.connected).length
   },
   actions: {

@@ -22,9 +22,9 @@ onMounted(() => {
     userStore.users = users
     userStore.session = session
     chatStore.rooms = rooms
-    
-    const redirect = decodeURIComponent((route.query.redirect as string) || '#/home')
-    window.location.replace(location.origin + redirect)
+
+    const redirect = decodeURIComponent((route.query.redirect as string) || '/home')
+    router.replace(redirect)
   })
   // 连接失败
   socket.on('connect_error', (err) => {

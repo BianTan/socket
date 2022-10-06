@@ -3,7 +3,7 @@
     <DanImage :src="detail.img" fit="cover" round class="avatar" />
     <div class="info">
       <div class="name">{{ detail?.name || '消息标题' }}</div>
-      <div class="msg">{{ detail?.msg || '消息标题' }}</div>
+      <div class="msg">{{ detail?.msg || ' ' }}</div>
     </div>
     <div v-if="detail.count" class="count">{{ count }}</div>
   </div>
@@ -49,6 +49,7 @@ const count = computed(() => {
       color: #999;
       font-size: 14px;
       line-height: 23px;
+      white-space: break-spaces;
     }
   }
   .count {

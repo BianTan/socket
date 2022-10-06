@@ -100,7 +100,8 @@ io.on('connection', (socket) => {
   })
   // 用户断开连接
   socket.on('disconnect', async () => {
-    const matchingSockets = await io.in(socket.userID).allSockets()
+    const matchingSockets = await io.in(socket.user.uid).allSockets()
+    console.log('matchingSockets', matchingSockets)
     const isDisconnected = matchingSockets.size === 0
     if (!isDisconnected) return
     // 给除了自己的人发送下线通知

@@ -20,10 +20,11 @@ router.beforeEach(async (to, from , next) => {
     next({
       name: 'Login',
       query: {
-        redirect: encodeURIComponent(window.location.hash)
+        redirect: encodeURIComponent(window.location.hash.replace('#', ''))
       }
     })
   }
+
   userStore.checkLogin()
 
   next()
