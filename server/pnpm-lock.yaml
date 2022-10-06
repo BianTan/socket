@@ -1,6 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
+  deepcopy: ^2.1.0
   express: ^4.18.1
   joi: ^17.6.2
   md5: ^2.3.0
@@ -9,6 +10,7 @@ specifiers:
   uuid: ^9.0.0
 
 dependencies:
+  deepcopy: 2.1.0
   express: 4.18.1
   joi: 17.6.2
   md5: 2.3.0
@@ -238,6 +240,12 @@ packages:
         optional: true
     dependencies:
       ms: 2.1.2
+    dev: false
+
+  /deepcopy/2.1.0:
+    resolution: {integrity: sha512-8cZeTb1ZKC3bdSCP6XOM1IsTczIO73fdqtwa2B0N15eAz7gmyhQo+mc5gnFuulsgN3vIQYmTgbmQVKalH1dKvQ==}
+    dependencies:
+      type-detect: 4.0.8
     dev: false
 
   /depd/2.0.0:
@@ -769,6 +777,11 @@ packages:
     dependencies:
       nopt: 1.0.10
     dev: true
+
+  /type-detect/4.0.8:
+    resolution: {integrity: sha512-0fr/mIH1dlO+x7TlcMy+bIDqKPsw/70tVyeHW787goQjhmqaZe10uwLujubK9q9Lg6Fiho1KUKDYz0Z7k7g5/g==}
+    engines: {node: '>=4'}
+    dev: false
 
   /type-is/1.6.18:
     resolution: {integrity: sha512-TkRKr9sUTxEH8MdfuCSP7VizJyzRNMjj2J2do2Jr3Kym598JVdEksuzPQCnlFPW4ky9Q+iA+ma9BGm06XQBy8g==}

@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "deepcopy": "^2.1.0",
     "express": "^4.18.1",
     "joi": "^17.6.2",
     "md5": "^2.3.0",

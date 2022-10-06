@@ -7,9 +7,10 @@ const io = require('socket.io')(httpServer, {
 })
 const md5 = require('md5')
 const { v4: uuidv4 } = require('uuid')
+const { UserSessionStore } = require('./sessonStore')
 
 // 注册用户
-const userMap = new Map()
+const userStore = new UserSessionStore()
 // 错误返回
 const ErrorReturn = (payload) => {
   if (typeof payload === 'string') {
@@ -30,15 +31,12 @@ const ErrorReturn = (payload) => {
 io.use((socket, next) => {
   const { session, nickname } = socket.handshake.auth
   if (session) {
-    const user = userMap.get(session)
+    const user = userStore.find(session)
     if (user) {
-      socket.user = { ...user }
+      socket.user = user
       socket.sessionID = session
       // 更新用户状态
-      userMap.set(socket.sessionID, {
-        ...socket.user,
-        connected: true
-      })
+      userStore.save(socket.sessionID, { connected: true })
       // 加入大厅和自己私聊
       socket.join(['main', user.uid])
       return next()
@@ -65,7 +63,7 @@ io.use((socket, next) => {
     connected: true,
     email
   }
-  userMap.set(sessionID, { ...user })
+  userStore.save(sessionID, user)
   socket.user = { ...user }
   socket.sessionID = sessionID
   // 加入大厅和自己私聊
@@ -75,7 +73,7 @@ io.use((socket, next) => {
 
 io.on('connection', (socket) => {
   console.log(socket.id)
-  const users = Array.from(userMap.values())
+  const users = userStore.findAll()
 
   // 登录
   socket.emit('login', {
@@ -112,10 +110,7 @@ io.on('connection', (socket) => {
       uid: socket.user.uid
     })
     // 并且更新用户状态 - 离线
-    userMap.set(socket.sessionID, {
-      ...socket.user,
-      connected: false
-    })
+    userStore.save(socket.sessionID, { connected: false })
   })
 
   // 发送消息
