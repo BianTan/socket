@@ -7,28 +7,13 @@ const io = require('socket.io')(httpServer, {
 })
 const md5 = require('md5')
 const { v4: uuidv4 } = require('uuid')
+const { ErrorReturn } = require('./utils')
 const { UserSessionStore, MessageSessionStore } = require('./sessonStore')
 
 // 注册用户
 const userStore = new UserSessionStore()
 // 服务器储存的消息
 const msgStore = new MessageSessionStore()
-
-// 错误返回
-const ErrorReturn = (payload) => {
-  if (typeof payload === 'string') {
-    return new Error(JSON.stringify({
-      code: 1000,
-      error: payload
-    }))
-  } else {
-    const { code, msg } = payload
-    return new Error(JSON.stringify({
-      code,
-      error: msg
-    }))
-  }
-}
 
 // 中间件
 io.use((socket, next) => {
