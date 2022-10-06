@@ -3,7 +3,7 @@
     <DanImage :src="detail.img" fit="cover" round class="avatar" />
     <div class="info">
       <div class="name">{{ detail?.name || '消息标题' }}</div>
-      <div class="msg">{{ detail?.msg || ' ' }}</div>
+      <div class="msg">{{ lastMsg }}</div>
     </div>
     <div v-if="detail.count" class="count">{{ count }}</div>
   </div>
@@ -11,12 +11,18 @@
 
 <script lang='ts' setup>
 import { computed } from 'vue'
-import { RoomItem } from '@/store/modules/chat'
+import { useChatStore, RoomItem } from '@/store/modules/chat'
 
 const props = withDefaults(defineProps<{
   detail: RoomItem;
 }>(), {})
 const emit = defineEmits(['click'])
+const chatStore = useChatStore()
+
+const lastMsg = computed(() => {
+  const list = chatStore.messageList[props.detail.id] || []
+  return list[list.length - 1].msg || ' '
+})
 
 const count = computed(() => {
   const num = props.detail.count

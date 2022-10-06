@@ -15,14 +15,16 @@ const userStore = useUserStore()
 const chatStore = useChatStore()
 const { socket } = useSocket()
 
-onMounted(() => {
+onMounted(async () => {
   // 登录
-  socket.once('login', ({ info, users, rooms, session }) => {
+  socket.on('login', ({ info, users, rooms, session, message }) => {
     userStore.info = info
     userStore.users = users
     userStore.session = session
     chatStore.rooms = rooms
+    chatStore.messageList = message
 
+    if (location.hash !== '#/login') return
     const redirect = (route.query.redirect as string) || '/home'
     router.replace(redirect)
   })

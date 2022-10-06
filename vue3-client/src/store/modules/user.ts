@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { useChatStore } from './chat'
 import { useSocket } from '@/hooks/useSocket'
 import { useStorage, StorageSerializers, RemovableRef } from '@vueuse/core'
 
@@ -36,9 +37,13 @@ export const useUserStore = defineStore({
     // 退出登录
     logout() {
       const { socket } = useSocket()
+      const chatStore = useChatStore()
+
       this.info = null
       this.users = []
       this.session = ''
+      chatStore.messageList = {}
+      
       socket.close()
     },
     // 检测登录

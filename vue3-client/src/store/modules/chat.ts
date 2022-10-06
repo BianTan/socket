@@ -9,16 +9,15 @@ export interface RoomItem {
   count?: number;
 }
 export interface MsgItem {
-  avatar: string;
-  nickname: string;
   msg: string;
-  isMe: boolean;
-  uid: string;
+  from: string;
+  to: string;
+  date: number;
 }
 interface ChatState {
   curRooms: string;
   rooms: RoomItem[];
-  msgMap: Record<string, MsgItem[]>;
+  messageList: Record<string, MsgItem[]>;
 }
 
 export const useChatStore = defineStore({
@@ -26,47 +25,17 @@ export const useChatStore = defineStore({
   state: (): ChatState => ({
     curRooms: '',
     rooms: [],
-    msgMap: {}
+    messageList: {}
   }),
   actions: {
-    onMessage(payload: {
-      msg: string;
-      from: string;
-      to: string;
-    }) {
+    onMessage(payload: MsgItem) {
       const userStore = useUserStore()
       if (!userStore.info) return
-      const { uid } = userStore.info
-      // 消息模板
-      const temp = {
-        avatar: '',
-        nickname: '',
-        uid: payload.from,
-        msg: payload.msg,
-        isMe: uid === payload.from
-      }
-      if (payload.to === 'main') {
-        // 发送给公共大厅
-        const fromUser = userStore.users.find(f => f.uid === payload.from)
-        if (!fromUser) return
-        Object.assign(temp, {
-          avatar: fromUser.avatar,
-          nickname: fromUser.nickname
-        })
-      } else {
-        // 发送给其它人
-        const fromInfo = this.rooms.find(f => f.id === payload.from)
-        if (!fromInfo) return
-        Object.assign(temp, {
-          avatar: fromInfo.img,
-          nickname: fromInfo.name
-        })
-      }
       // 查找
-      let toMsgList = this.msgMap[payload.to]
-      if (!toMsgList) toMsgList = this.msgMap[payload.to] = []
+      let toMsgList = this.messageList[payload.to]
+      if (!toMsgList) toMsgList = this.messageList[payload.to] = []
       // 新增记录
-      toMsgList.push(temp)
+      toMsgList.push(payload)
 
       // 下面是给聊天列表添加新消息红点提醒的操作
       const indexOf = this.rooms.findIndex(f => f.id === payload.to)

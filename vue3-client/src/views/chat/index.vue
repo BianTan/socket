@@ -41,7 +41,7 @@
 <script lang='ts' setup>
 import { ref, computed, onMounted, nextTick, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useChatStore } from '@/store/modules/chat'
+import { MsgItem, useChatStore } from '@/store/modules/chat'
 import { useUserStore } from '@/store/modules/user'
 import { useSocket } from '@/hooks/useSocket'
 
@@ -59,8 +59,28 @@ const id = ref(route.params.id)
 const content = ref('')
 const isGroup = ref(id.value === 'main')
 const list = computed(() => {
-  const msgList = chatStore.msgMap[id.value as string]
-  return msgList || []
+  const format = ({ msg, from, date }: MsgItem): {
+    nickname: string;
+    isMe: boolean;
+    msg: string;
+    uid: string;
+    date: number;
+    avatar: string;
+    connected: boolean;
+  } => {
+    const { nickname = '', avatar = '', connected = false } = (userStore.users.find(f => f.uid === from) || {})
+    const isMe = from === userStore.info?.uid
+    return {
+      nickname,
+      avatar,
+      connected,
+      isMe,
+      msg,
+      uid: from,
+      date
+    }
+  }
+  return (chatStore.messageList[id.value as string] || []).map(m => format(m))
 })
 const roomDetail = computed(() => {
   return chatStore.rooms.find(f => f.id === id.value)
@@ -88,16 +108,15 @@ const onSend = () => {
   if (!payload.msg.trim()) return
 
   if (!isGroup) payload['to'] = id.value as string
-  let msgList = chatStore.msgMap[id.value as string]
-  if (!msgList) msgList = chatStore.msgMap[id.value as string] = []
-  const { avatar, nickname, uid } = userStore.info
+  let msgList = chatStore.messageList[id.value as string]
+  if (!msgList) msgList = chatStore.messageList[id.value as string] = []
+  const { uid } = userStore.info
   // 自己发的手动插入一条新消息
   msgList.push({
-    avatar,
-    nickname,
-    uid,
     msg: content.value,
-    isMe: true
+    from: uid,
+    to: payload.to || 'main',
+    date: new Date().getTime()
   })
   content.value = ''
   // 更新列表的最新消息

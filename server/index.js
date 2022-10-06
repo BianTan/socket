@@ -7,10 +7,13 @@ const io = require('socket.io')(httpServer, {
 })
 const md5 = require('md5')
 const { v4: uuidv4 } = require('uuid')
-const { UserSessionStore } = require('./sessonStore')
+const { UserSessionStore, MessageSessionStore } = require('./sessonStore')
 
 // 注册用户
 const userStore = new UserSessionStore()
+// 服务器储存的消息
+const msgStore = new MessageSessionStore()
+
 // 错误返回
 const ErrorReturn = (payload) => {
   if (typeof payload === 'string') {
@@ -86,7 +89,8 @@ io.on('connection', (socket) => {
         img: socket.user.avatar,
         id: 'main'
       }
-    ]
+    ],
+    message: msgStore.find(socket.user.uid)
   })
   
   socket.emit('加入的房间', [...socket.rooms])
@@ -118,19 +122,19 @@ io.on('connection', (socket) => {
     // 空消息不做处理
     if (!msg.trim()) return
     const { uid } = socket.user
-    if (type === 1) {
-      socket.to('main').emit('message', {
-        msg,
-        from: uid,
-        to: 'main'
-      })
-    } else {
-      socket.to(to).to(socket.user.uid).emit('message', {
-        msg,
-        from: uid,
-        to
-      })
+    const message = {
+      msg,
+      from: uid,
+      to: type === 1 ? 'main' : to,
+      date: new Date().getTime()
     }
+    // 发送信息
+    type === 1
+      ? socket.to('main').emit('message', message)
+      : socket.to(to).to(socket.user.uid).emit('message', message)
+    // 储存至本地
+    msgStore.save(message)
+    console.log('message', message)
   })
 })
 

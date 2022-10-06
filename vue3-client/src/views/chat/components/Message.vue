@@ -9,7 +9,7 @@
     />
     <div class="info">
       <div v-if="!detail.isMe" class="name">
-        <span :class="['state', { online: userInfo?.connected }]" />
+        <span :class="['state', { online: detail.connected }]" />
         {{ detail.nickname }}
       </div>
       <div v-text="detail.msg" class="msg-card" />
@@ -18,19 +18,21 @@
 </template>
 
 <script lang='ts' setup>
-import { computed } from 'vue'
-import { MsgItem } from '@/store/modules/chat'
-import { useUserStore } from '@/store/modules/user'
 
-const props = withDefaults(defineProps<{
-  detail: MsgItem;
+withDefaults(defineProps<{
+  detail: {
+    nickname: string;
+    isMe: boolean;
+    msg: string;
+    uid: string;
+    date: number;
+    avatar: string;
+    connected: boolean;
+  };
   avatar?: boolean;
 }>(), {
   avatar: true
 })
-
-const userStore = useUserStore()
-const userInfo = computed(() => userStore.users.find(f => f.uid === props.detail.uid))
 
 </script>
 
