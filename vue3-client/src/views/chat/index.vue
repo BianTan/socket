@@ -190,6 +190,7 @@ onUnmounted(() => {
     .iconfont {
       font-size: 20px;
       padding: 0 12px;
+      cursor: pointer;
     }
     .center {
       flex: 1;
@@ -242,6 +243,7 @@ onUnmounted(() => {
         padding: 8px 16px;
         border-radius: 8px;
         margin-left: 16px;
+        cursor: pointer;
         background-color: white;
       }
     }

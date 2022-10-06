@@ -18,7 +18,8 @@ export default defineConfig({
       plugins: [
         pxtorem({
           rootValue: 37.5,
-          propList: ['*']
+          propList: ['*'],
+          selectorBlackList: ['global', 'html']
         })
       ]
     }

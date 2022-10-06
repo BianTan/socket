@@ -66,6 +66,7 @@ const login = () => {
       }
       input {
         flex: 1;
+        width: 100%;
         outline: none;
         margin-left: 12px;
         padding: 6px 12px;

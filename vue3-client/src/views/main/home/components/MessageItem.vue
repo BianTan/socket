@@ -39,6 +39,7 @@ const count = computed(() => {
   padding: 12px 16px;
   background-color: #E8E8E8;
   position: relative;
+  cursor: pointer;
   .avatar {
     width: 52px;
     height: 52px;

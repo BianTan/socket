@@ -3,3 +3,11 @@
 body, html, #app {
   height: 100%;
 }
+
+.global {
+  border: 1px solid #eee;
+  box-sizing: border-box;
+  max-width: 640px;
+  margin: 0 auto;
+  // background-color: #fff;
+}

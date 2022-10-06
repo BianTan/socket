@@ -47,6 +47,7 @@ const emit = defineEmits(['tap'])
     height: 42px;
     flex-shrink: 0;
     order: 1;
+    cursor: pointer;
   }
   .info {
     order: 2;
