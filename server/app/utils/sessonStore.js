@@ -83,8 +83,13 @@ class MessageStore2 extends SessionStore {
       [uid, 'main'].includes(to)
     ))
     return all.reduce((temp, c) => {
-      if (!temp[c.to]) temp[c.to] = []
-      temp[c.to].push(c)
+      if (c.to === 'main' || c.from === uid) {
+        if (!temp[c.to]) temp[c.to] = []
+        temp[c.to].push(c)
+      } else if (c.to === uid) {
+        if (!temp[c.from]) temp[c.from] = []
+        temp[c.from].push(c)
+      }
       return temp
     }, {})
   }

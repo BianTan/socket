@@ -6,6 +6,7 @@
       class="avatar"
       fit="cover"
       round
+      @click="() => emit('tap')"
     />
     <div class="info">
       <div v-if="!detail.isMe" class="name">
@@ -33,6 +34,7 @@ withDefaults(defineProps<{
 }>(), {
   avatar: true
 })
+const emit = defineEmits(['tap'])
 
 </script>
 

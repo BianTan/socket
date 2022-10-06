@@ -1,9 +1,9 @@
 <template>
-  <router-view />
+  <router-view :key="path" />
 </template>
 
 <script lang="ts" setup>
-import { onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/store/modules/user'
 import { useChatStore } from '@/store/modules/chat'
@@ -14,6 +14,8 @@ const router = useRouter()
 const userStore = useUserStore()
 const chatStore = useChatStore()
 const { socket } = useSocket()
+
+const path = computed(() => route.path)
 
 onMounted(async () => {
   // 登录

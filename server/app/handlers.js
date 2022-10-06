@@ -3,20 +3,32 @@ const { userStore, msgStore } = require('./global')
 const connectionSetup = (socket) => {
   console.log(socket.id)
   const users = userStore.findAll()
+  console.log('users', users)
 
   // 登录
+  const message = msgStore.find(socket.user.uid)
+  const msgKey = Object.keys(message)
   socket.emit('login', {
     session: socket.sessionID,
     info: socket.user,
     users,
-    rooms: [
-      {
-        name: '公共大厅',
-        img: socket.user.avatar,
-        id: 'main'
-      }
-    ],
-    message: msgStore.find(socket.user.uid)
+    rooms: msgKey.length
+      ? msgKey.map(key => {
+        const info = users.find(f => f.uid === key)
+        return {
+          name: info?.nickname || '公共大厅',
+          img: info?.avatar || socket.user.avatar,
+          id: key || 'main'
+        }
+      })
+      : [
+        {
+          name: '公共大厅',
+          img: socket.user.avatar,
+          id: 'main'
+        }
+      ],
+    message,
   })
 
   // 用户连接

@@ -11,5 +11,5 @@ createApplication(httpServer, {
 })
 
 httpServer.listen(PORT, () => {
-  console.log('listening on *:9527')
+  console.log(`listening on *:${PORT}`)
 })

@@ -28,22 +28,42 @@ export const useChatStore = defineStore({
     messageList: {}
   }),
   actions: {
+    // 接收到新消息
     onMessage(payload: MsgItem) {
       const userStore = useUserStore()
       if (!userStore.info) return
+      const { to, from } = payload
+      const { uid: curUID } = userStore.info
       // 查找
-      let toMsgList = this.messageList[payload.to]
-      if (!toMsgList) toMsgList = this.messageList[payload.to] = []
+      const key = (to === 'main' || from === curUID) ? to : from
+      let toMsgList = this.messageList[key]
+      if (!toMsgList) toMsgList = this.messageList[key] = []
       // 新增记录
       toMsgList.push(payload)
 
-      // 下面是给聊天列表添加新消息红点提醒的操作
-      const indexOf = this.rooms.findIndex(f => f.id === payload.to)
-      const { id, count = 0 } = this.rooms[indexOf]
-      Object.assign(this.rooms[indexOf], {
-        msg: payload.msg,
-        count: this.curRooms === id ? 0 : count + 1
-      })
+      const { msg } = payload
+      const indexOf = this.rooms.findIndex(({ id }) => id === from || id === to)
+      console.log('indexOf', indexOf, from, to)
+      if (indexOf < 0) {
+        const user = userStore.users.find(({ uid }) => uid === payload.from)
+        if (!user) return
+        const { nickname, avatar, uid } = user
+        // 新增列表
+        this.rooms.push({
+          name: nickname,
+          img: avatar,
+          id: uid,
+          count: 1,
+          msg
+        })
+      } else {
+        // 聊天列表添加新消息红点提醒
+        const { id, count = 0 } = this.rooms[indexOf]
+        Object.assign(this.rooms[indexOf], {
+          msg,
+          count: this.curRooms === id ? 0 : count + 1
+        })
+      }
     }
   }
 })

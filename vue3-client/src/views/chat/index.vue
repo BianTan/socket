@@ -22,6 +22,7 @@
         :key="index"
         :detail="item"
         :avatar="isGroup"
+        @tap="() => onTap(item)"
       />
     </div>
     <div class="footer-action">
@@ -57,7 +58,7 @@ const MsgListRef = ref()
 
 const id = ref(route.params.id)
 const content = ref('')
-const isGroup = ref(id.value === 'main')
+const isGroup = computed(() => id.value === 'main')
 const list = computed(() => {
   const format = ({ msg, from, date }: MsgItem): {
     nickname: string;
@@ -101,13 +102,13 @@ const onSend = () => {
     msg: string;
     to?: string;
   } = {
-    type: isGroup ? 1 : 2,
+    type: isGroup.value ? 1 : 2,
     msg: content.value
   }
   if (!userStore.info) return
   if (!payload.msg.trim()) return
 
-  if (!isGroup) payload['to'] = id.value as string
+  if (!isGroup.value) payload['to'] = id.value as string
   let msgList = chatStore.messageList[id.value as string]
   if (!msgList) msgList = chatStore.messageList[id.value as string] = []
   const { uid } = userStore.info
@@ -120,7 +121,7 @@ const onSend = () => {
   })
   content.value = ''
   // 更新列表的最新消息
-  const roomIndex = chatStore.rooms.findIndex(f => f.id === (isGroup ? 'main' : payload.to))
+  const roomIndex = chatStore.rooms.findIndex(f => f.id === (isGroup.value ? 'main' : payload.to))
   if (roomIndex >= 0) {
     Object.assign(chatStore.rooms[roomIndex], {
       msg: payload.msg.trim()
@@ -131,6 +132,30 @@ const onSend = () => {
   // 发送消息
   socket.emit('message', payload)
 }
+const onTap = (item: {
+    nickname: string;
+    isMe: boolean;
+    msg: string;
+    uid: string;
+    date: number;
+    avatar: string;
+    connected: boolean;
+  }) => {
+    if (item.isMe) return
+    const { nickname, uid, avatar } = item
+    chatStore.rooms.push({
+      name: nickname,
+      img: avatar,
+      id: uid
+    })
+    router.push({
+      name: 'Chat',
+      params: {
+        id: item.uid
+      }
+    })
+}
+
 const updateScroll = async () => {
   if (!MsgListRef.value) return
   await nextTick()

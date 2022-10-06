@@ -2,6 +2,7 @@
   <div
     class="dan-image"
     :style="{ borderRadius }"
+    @click="() => emit('click')"
   >
     <img
       v-if="src"
@@ -23,6 +24,7 @@ const props = withDefaults(defineProps<{
 }>(), {
   fit: 'none'
 })
+const emit = defineEmits(['click'])
 
 const borderRadius = computed(() => {
   const { round, radius } = props
