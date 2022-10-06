@@ -21,7 +21,7 @@ const chatStore = useChatStore()
 
 const lastMsg = computed(() => {
   const list = chatStore.messageList[props.detail.id]
-  return list ? list[list.length - 1].msg : ' '
+  return list ? list[list.length - 1].msg : '[快来发送第一条信息吧]'
 })
 
 const count = computed(() => {
@@ -43,9 +43,11 @@ const count = computed(() => {
   .avatar {
     width: 52px;
     height: 52px;
+    flex-shrink: 0;
   }
   .info {
     flex: 1;
+    overflow: hidden;
     padding-left: 12px;
     .name {
       color: #333;
@@ -56,7 +58,9 @@ const count = computed(() => {
       color: #999;
       font-size: 14px;
       line-height: 23px;
-      white-space: break-spaces;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
   }
   .count {

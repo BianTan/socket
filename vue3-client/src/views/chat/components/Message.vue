@@ -78,6 +78,9 @@ const emit = defineEmits(['tap'])
       font-size: 16px;
       border-radius: 0 8px 8px;
       background-color: white;
+      overflow: hidden;
+      word-break: break-all;
+      white-space: break-spaces;
     }
   }
   &.is-me {

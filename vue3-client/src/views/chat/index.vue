@@ -219,7 +219,8 @@ onUnmounted(() => {
   .message-list {
     flex: 1;
     padding: 12px;
-    overflow-x: scroll;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
   .footer-action {
     font-size: 16px;
