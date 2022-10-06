@@ -2,13 +2,29 @@ const httpServer = require('http').createServer()
 const io = require('socket.io')(httpServer, {
   cors: {
     origin: ['http://localhost:5173', 'http://coolaf.com']
-  }
+  },
+  serveClient: false
 })
 const md5 = require('md5')
 const { v4: uuidv4 } = require('uuid')
 
 // 注册用户
 const userMap = new Map()
+// 错误返回
+const ErrorReturn = (payload) => {
+  if (typeof payload === 'string') {
+    return new Error(JSON.stringify({
+      code: 1000,
+      error: payload
+    }))
+  } else {
+    const { code, msg } = payload
+    return new Error(JSON.stringify({
+      code,
+      error: msg
+    }))
+  }
+}
 
 // 中间件
 io.use((socket, next) => {
@@ -23,20 +39,23 @@ io.use((socket, next) => {
         ...socket.user,
         connected: true
       })
-      // 加入房间
-      socket.join('main')
+      // 加入大厅和自己私聊
+      socket.join(['main', user.uid])
       return next()
-    }
-    if (!nickname) {
-      return next(new Error('无用户信息'))
+    } else {
+      return next(ErrorReturn({
+        code: 1001,
+        msg: '登录失效'
+      }))
     }
   }
   const { email = ''  } = socket.handshake.auth
   if (!nickname) {
-    return next(new Error("用户昵称不能为空"))
+    return next(ErrorReturn('用户昵称不能为空'))
   }
   // const avatar = email ? `https://www.gravatar.com/avatar/${md5(email)}?s=64` : ''
-  const avatar = `https://www.gravatar.com/avatar/${md5(email)}?s=64`
+  // 使用 CDN 加速头像
+  const avatar = `https://cdn.v2ex.com/gravatar/${md5(email)}?s=64`
   const sessionID = uuidv4()
   // 用户信息
   const user = {
@@ -49,8 +68,8 @@ io.use((socket, next) => {
   userMap.set(sessionID, { ...user })
   socket.user = { ...user }
   socket.sessionID = sessionID
-  // 加入大厅
-  socket.join('main')
+  // 加入大厅和自己私聊
+  socket.join(['main', user.uid])
   next()
 })
 

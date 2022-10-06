@@ -1,6 +1,6 @@
 import { io, Socket } from 'socket.io-client'
 
-const URL = 'http://localhost:9527'
+const URL = 'http://192.168.2.231:9527'
 let socket: Socket = io(URL, {
   autoConnect: false,
   transports : ['websocket'] 

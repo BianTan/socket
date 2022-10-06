@@ -24,8 +24,7 @@ router.beforeEach(async (to, from , next) => {
       }
     })
   }
-  // 获取用户信息
-  await userStore.getUserInfo()
+  userStore.checkLogin()
 
   next()
 })

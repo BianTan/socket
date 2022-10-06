@@ -16,53 +16,28 @@
 </template>
 
 <script lang='ts' setup>
-import { reactive, onMounted, onUnmounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { reactive } from 'vue'
 import { useUserStore } from '@/store/modules/user'
-import { useChatStore } from '@/store/modules/chat'
-import { useSocket } from '@/hooks/useSocket'
 
-const { socket } = useSocket()
-const route = useRoute()
 const userStore = useUserStore()
-const chatStore = useChatStore()
 
 const loginForm = reactive({
   nickname: '',
   email: ''
 })
 
-const login = () => userStore.login(loginForm)
-
-const init = () => {
-  const session = localStorage.getItem('session')
-  if (!session) return
-  userStore.login({ session })
+const login = () => {
+  const { nickname, email } = loginForm
+  if (!nickname) {
+    alert('请输入用户昵称')
+    return
+  }
+  if (email && !email.match(/^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/)) {
+    alert('请输入正确的邮箱')
+    return
+  }
+  userStore.login(loginForm)
 }
-init()
-
-onMounted(() => {
-  // 登录
-  socket.on('login', ({ info, users, rooms, session }) => {
-    userStore.info = info
-    userStore.users = users
-    chatStore.rooms = rooms
-
-    localStorage.setItem('session', session)
-    
-    const redirect = decodeURIComponent((route.query.redirect as string) || '#/home')
-    window.location.replace(location.origin + redirect)
-  })
-  // 连接失败
-  socket.on('connect_error', (err) => {
-    console.log('err.message', err.message)
-    localStorage.removeItem('session')
-  })
-})
-onUnmounted(() => {
-  socket.off('connect_error')
-  socket.off('login')
-})
 
 </script>
 
