@@ -20,8 +20,8 @@ const emit = defineEmits(['click'])
 const chatStore = useChatStore()
 
 const lastMsg = computed(() => {
-  const list = chatStore.messageList[props.detail.id] || []
-  return list[list.length - 1].msg || ' '
+  const list = chatStore.messageList[props.detail.id]
+  return list ? list[list.length - 1].msg : ' '
 })
 
 const count = computed(() => {

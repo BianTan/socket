@@ -24,7 +24,7 @@ onMounted(async () => {
     chatStore.rooms = rooms
     chatStore.messageList = message
 
-    if (location.hash !== '#/login') return
+    if (!location.hash.match(/\#\/login/)) return
     const redirect = (route.query.redirect as string) || '/home'
     router.replace(redirect)
   })
